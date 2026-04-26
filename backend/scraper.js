@@ -15,35 +15,64 @@ const cheerio = require('cheerio');
 
 // ─── Produtos monitorados ─────────────────────────────────────────────────────
 // Cada entrada define um slug único, categoria e URLs por loja
+// ─────────────────────────────────────────────────────────────────────────────
+// WATCHLIST — Top produtos mais buscados no Brasil (hardware gamer, 2025)
+// Todas as URLs são páginas de produto direto (/dp/), nunca buscas (/s?k=)
+// ─────────────────────────────────────────────────────────────────────────────
 const WATCHLIST = [
+
+  // ── GPUs ──────────────────────────────────────────────────────────────────
+
   {
-    slug: 'rtx-4070-super-12gb',
-    name: 'RTX 4070 Super 12GB',
-    category: 'gpu',
-    image_url: 'https://i.imgur.com/placeholder1.png',
-    sources: [
-      { store: 'Kabum',  url: 'https://www.kabum.com.br/produto/558819/placa-de-video-rtx-4070-super' },
-      { store: 'Pichau', url: 'https://www.pichau.com.br/placa-de-video-gigabyte-geforce-rtx-4070-super' },
-    ],
-  },
-  {
-    slug: 'rtx-3060-12gb',
-    name: 'RTX 3060 12GB',
+    slug: 'rtx-4060-8gb-msi-ventus',
+    name: 'RTX 4060 8GB MSI Ventus',
     category: 'gpu',
     image_url: null,
     sources: [
-      { store: 'Kabum',  url: 'https://www.kabum.com.br/produto/166474/placa-de-video-rtx-3060-12gb' },
-      { store: 'Amazon', url: 'https://www.amazon.com.br/s?k=rtx+3060+12gb' },
+      // #1 GPU mais vendida geração Ada no BR
+      { store: 'Amazon', url: 'https://www.amazon.com.br/Placa-128Bits-Ventus-MSI-912-V516-012/dp/B0C7W8GZMJ' },
     ],
   },
   {
-    slug: 'rtx-4060-8gb',
-    name: 'RTX 4060 8GB',
+    slug: 'rtx-4060-ti-8gb-msi-ventus',
+    name: 'RTX 4060 Ti 8GB MSI Ventus',
     category: 'gpu',
     image_url: null,
     sources: [
-      { store: 'Amazon', url: 'https://www.amazon.com.br/s?k=rtx+4060+8gb' },
-      { store: 'Pichau', url: 'https://www.pichau.com.br/placa-de-video-msi-geforce-rtx-4060' },
+      { store: 'Amazon', url: 'https://www.amazon.com.br/Placa-Video-VENTUS-MSI-912-V515/dp/B0C4F7KX1B' },
+    ],
+  },
+  {
+    slug: 'rtx-3060-12gb-asus-tuf',
+    name: 'RTX 3060 12GB ASUS TUF',
+    category: 'gpu',
+    image_url: null,
+    sources: [
+      // Ainda muito popular custo-benefício
+      { store: 'Amazon', url: 'https://www.amazon.com.br/Placa-V%C3%ADdeo-ASUS-TUF-Gaming/dp/B096658ZWP' },
+    ],
+  },
+  {
+    slug: 'rx-6600-8gb-asrock',
+    name: 'RX 6600 8GB ASRock Challenger',
+    category: 'gpu',
+    image_url: null,
+    sources: [
+      // AMD mais vendida entrada/intermediário
+      { store: 'Amazon', url: 'https://www.amazon.com.br/ASRock-Placa-gr%C3%A1fica-Challenger-resfriamento/dp/B09KG8JXQR' },
+    ],
+  },
+
+  // ── CPUs ─────────────────────────────────────────────────────────────────
+
+  {
+    slug: 'ryzen-5-5500',
+    name: 'Ryzen 5 5500',
+    category: 'cpu',
+    image_url: null,
+    sources: [
+      // #1 mais vendido CPU AM4 custo-benefício
+      { store: 'Amazon', url: 'https://www.amazon.com.br/Processador-AMD-Ryzen-5500-100100000457BOX/dp/B09HM4NRJJ' },
     ],
   },
   {
@@ -52,29 +81,103 @@ const WATCHLIST = [
     category: 'cpu',
     image_url: null,
     sources: [
-      { store: 'Kabum',  url: 'https://www.kabum.com.br/produto/216843/processador-amd-ryzen-5-5600' },
-      { store: 'Amazon', url: 'https://www.amazon.com.br/s?k=ryzen+5+5600' },
+      { store: 'Amazon', url: 'https://www.amazon.com.br/PROCESSADOR-AMD-5600-100-100000927BOX-Cer%C3%A2mica/dp/B09VCHR1VH' },
     ],
   },
   {
-    slug: 'kingston-fury-32gb-ddr5',
-    name: 'Kingston Fury 32GB DDR5',
-    category: 'ram',
-    image_url: null,
-    sources: [
-      { store: 'Pichau', url: 'https://www.pichau.com.br/memoria-ram-kingston-fury-beast-ddr5-32gb' },
-      { store: 'Kabum',  url: 'https://www.kabum.com.br/produto/535898/memoria-ram-kingston-fury-beast-32gb-ddr5' },
-    ],
-  },
-  {
-    slug: 'ryzen-7-7700x',
-    name: 'Ryzen 7 7700X',
+    slug: 'ryzen-5-5600x',
+    name: 'Ryzen 5 5600X',
     category: 'cpu',
     image_url: null,
     sources: [
-      { store: 'Kabum',  url: 'https://www.kabum.com.br/produto/386527/processador-amd-ryzen-7-7700x' },
+      { store: 'Amazon', url: 'https://www.amazon.com.br/Processador-AMD-Ryzen-5600X-Threads/dp/B08166SLDF' },
     ],
   },
+  {
+    slug: 'ryzen-7-5700x',
+    name: 'Ryzen 7 5700X',
+    category: 'cpu',
+    image_url: null,
+    sources: [
+      // Muito procurado para upgrade AM4
+      { store: 'Amazon', url: 'https://www.amazon.com.br/PROCESSADOR-AMD-RYZEN-5700X-100-100000926WOF/dp/B09VCGKZH1' },
+    ],
+  },
+  {
+    slug: 'ryzen-5-7600',
+    name: 'Ryzen 5 7600',
+    category: 'cpu',
+    image_url: null,
+    sources: [
+      // Melhor custo-benefício AM5 2025
+      { store: 'Amazon', url: 'https://www.amazon.com.br/PROCESSADOR-AMD-RYZEN-7600-100-100001015BOX/dp/B0BBJDS4GM' },
+    ],
+  },
+
+  // ── RAM ───────────────────────────────────────────────────────────────────
+
+  {
+    slug: 'kingston-fury-beast-32gb-ddr5',
+    name: 'Kingston Fury Beast 32GB DDR5 5600',
+    category: 'ram',
+    image_url: null,
+    sources: [
+      // Módulo único desktop mais popular DDR5
+      { store: 'Amazon', url: 'https://www.amazon.com.br/KF556C40BB-32-M%C3%B3dulo-mem%C3%B3ria-5600Mhz-desktop/dp/B09T8WL54M' },
+    ],
+  },
+  {
+    slug: 'kingston-fury-beast-rgb-32gb-ddr5-kit',
+    name: 'Kingston Fury Beast RGB Kit 2x16GB DDR5',
+    category: 'ram',
+    image_url: null,
+    sources: [
+      // Kit dual-channel mais buscado DDR5 com RGB
+      { store: 'Amazon', url: 'https://www.amazon.com.br/Kingston-Technology-sincroniza%C3%A7%C3%A3o-infravermelha-KF556C36BBEAK2-32/dp/B0BD5VH64R' },
+    ],
+  },
+  {
+    slug: 'corsair-vengeance-32gb-ddr4-3200',
+    name: 'Corsair Vengeance LPX 32GB DDR4 3200',
+    category: 'ram',
+    image_url: null,
+    sources: [
+      // Kit DDR4 mais vendido ainda no Brasil (plataformas AM4/LGA1200)
+      { store: 'Amazon', url: 'https://www.amazon.com.br/CORSAIR-CMK32GX4M2E3200C16-Vengeance-3200MHz-Desktop/dp/B08C4Z69LN' },
+    ],
+  },
+
+  // ── SSD ───────────────────────────────────────────────────────────────────
+
+  {
+    slug: 'kingston-nv3-1tb-nvme',
+    name: 'Kingston NV3 1TB NVMe M.2',
+    category: 'ssd',
+    image_url: null,
+    sources: [
+      // #1 SSD mais vendido absoluto na Amazon BR 2025
+      { store: 'Amazon', url: 'https://www.amazon.com.br/Kingston-NV3-2280-NVMe-SNV3S/dp/B0BBWH7DBT' },
+    ],
+  },
+  {
+    slug: 'kingston-nv3-2tb-nvme',
+    name: 'Kingston NV3 2TB NVMe M.2',
+    category: 'ssd',
+    image_url: null,
+    sources: [
+      { store: 'Amazon', url: 'https://www.amazon.com.br/Kingston-NV3-2280-NVMe-SNV3S/dp/B0C7YKT74D' },
+    ],
+  },
+  {
+    slug: 'samsung-980-1tb-nvme',
+    name: 'Samsung 980 1TB NVMe M.2',
+    category: 'ssd',
+    image_url: null,
+    sources: [
+      { store: 'Amazon', url: 'https://www.amazon.com.br/Samsung-MZ-V8V1T0B-AM-980-SSD/dp/B08GVFF1VB' },
+    ],
+  },
+
 ];
 
 // ─── User agents rotativos ────────────────────────────────────────────────────

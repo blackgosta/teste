@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechDrop — Melhores Ofertas</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Variables ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #06090f;
+  --surface:  #0d1117;
+  --surface2: #161b22;
+  --border:   #1e2530;
+  --accent:   #00ff88;
+  --accent2:  #00bfff;
+  --warn:     #ffb300;
+  --danger:   #ff5c5c;
+  --text:     #dde4ef;
+  --muted:    #5b6577;
+  --font-display: 'Syne', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* animated grid */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    linear-gradient(rgba(0,255,136,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* scanline overlay */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,.08) 2px, rgba(0,0,0,.08) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Layout ─────────────────────────────────────────────────── */
+.wrap {
+  max-width: 1020px;
+  margin: 0 auto;
+  padding: 44px 24px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 52px;
+  flex-wrap: wrap;
+}
+
+.logo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.pulsedot {
+  width: 7px; height: 7px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulsate 2s ease-in-out infinite;
+}
+
+@keyframes pulsate {
+  0%,100% { box-shadow: 0 0 0 0 rgba(0,255,136,.5); }
+  50%      { box-shadow: 0 0 0 7px rgba(0,255,136,0); }
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 5.5vw, 48px);
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1.05;
+  color: var(--text);
+}
+
+h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.tagline {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .07em;
+}
+
+/* Stats bar */
+.stats {
+  display: flex;
+  gap: 28px;
+  align-items: flex-end;
+}
+
+.stat { text-align: right; }
+
+.stat-n {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+  transition: color .3s;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ── Filters ─────────────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-sep {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+
+.pill {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .18s;
+}
+
+.pill:hover { border-color: var(--accent); color: var(--accent); }
+.pill.on    { background: rgba(0,255,136,.1); border-color: var(--accent); color: var(--accent); }
+
+/* Sort + Refresh */
+.toolbar-right { display: flex; gap: 8px; align-items: center; }
+
+.sort-select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: .06em;
+  outline: none;
+  transition: border-color .2s;
+}
+
+.sort-select:hover { border-color: var(--muted); }
+
+.btn-refresh {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 5px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-refresh:hover { border-color: var(--accent); color: var(--accent); }
+.btn-refresh.loading .spin { animation: spin .6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Table header ────────────────────────────────────────────── */
+.table-head {
+  display: grid;
+  grid-template-columns: 36px 1fr 110px 110px 90px 120px;
+  gap: 0 16px;
+  padding: 8px 28px;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+
+/* ── Deals list ──────────────────────────────────────────────── */
+#deals-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ── Card ────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 36px 1fr 110px 110px 90px 120px;
+  align-items: center;
+  gap: 0 16px;
+  padding: 18px 28px;
+  position: relative;
+  transition: background .15s;
+  cursor: default;
+  animation: fadeUp .35s ease both;
+}
+
+.card:first-child { border-top: none; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* stagger */
+.card:nth-child(1) { animation-delay: .04s; }
+.card:nth-child(2) { animation-delay: .08s; }
+.card:nth-child(3) { animation-delay: .12s; }
+.card:nth-child(4) { animation-delay: .16s; }
+.card:nth-child(5) { animation-delay: .20s; }
+.card:nth-child(6) { animation-delay: .24s; }
+
+/* accent bar */
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background .15s;
+}
+
+.card:hover { background: var(--surface2); }
+.card:hover::before { background: var(--accent); }
+.card.top1::before  { background: var(--accent); }
+
+/* rank */
+.c-rank {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--border);
+  text-align: center;
+  transition: color .15s;
+}
+.card.top1 .c-rank { color: var(--accent); }
+.card:hover .c-rank { color: var(--accent); }
+
+/* name col */
+.c-name {}
+.c-name-main {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -.01em;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+.b-hot   { background: rgba(255,92,92,.13); color: var(--danger); border: 1px solid rgba(255,92,92,.28); }
+.b-new   { background: rgba(0,191,255,.1);  color: var(--accent2); border: 1px solid rgba(0,191,255,.25); }
+.b-lim   { background: rgba(255,179,0,.1);  color: var(--warn); border: 1px solid rgba(255,179,0,.25); }
+
+.c-meta {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.store-dot { width: 4px; height: 4px; background: currentColor; border-radius: 50%; }
+
+/* price cols */
+.c-price {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -.02em;
+  white-space: nowrap;
+}
+
+.c-original {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: line-through;
+  white-space: nowrap;
+}
+
+/* discount */
+.c-disc {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--danger);
+  white-space: nowrap;
+}
+
+.c-disc.good { color: var(--accent); }
+
+/* buy btn */
+.btn-buy {
+  background: var(--accent);
+  color: #06090f;
+  border: none;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 10px 0;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  transition: all .15s;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.btn-buy:hover {
+  background: #00d472;
+  box-shadow: 0 4px 18px rgba(0,255,136,.25);
+  transform: translateY(-1px);
+}
+
+.btn-buy:active { transform: none; }
+
+/* ── Skeleton loader ─────────────────────────────────────────── */
+.skeleton {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.skel-bar {
+  background: var(--surface2);
+  border-radius: 4px;
+  animation: shimmer 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes shimmer {
+  0%,100% { opacity: .4; }
+  50%      { opacity: .9; }
+}
+
+/* ── Empty / error states ────────────────────────────────────── */
+.state-msg {
+  padding: 64px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: .05em;
+}
+
+.state-msg b { color: var(--text); display: block; font-size: 16px; margin-bottom: 8px; font-family: var(--font-display); }
+
+/* ── Footer ──────────────────────────────────────────────────── */
+footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.footer-live {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-note {
+  font-size: 10px;
+  color: var(--muted);
+  opacity: .5;
+  letter-spacing: .05em;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .table-head { display: none; }
+
+  .card {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 10px;
+    padding: 18px 20px;
+  }
+
+  .c-rank { display: none; }
+
+  .c-price-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .btn-buy { width: auto; padding: 10px 20px; }
+
+  .stats { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <header>
+    <div>
+      <div class="logo-pill"><div class="pulsedot"></div> TechDrop</div>
+      <h1>Melhores <em>Ofertas</em></h1>
+      <p class="tagline">// hardware monitorado em tempo real · atualiza a cada 3h</p>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-n" id="s-deals">—</div>
+        <div class="stat-label">Ofertas</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n" id="s-savings">—</div>
+        <div class="stat-label">Em economia</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="filters">
+      <span class="filter-sep">filtrar //</span>
+      <button class="pill on"  onclick="setFilter('all',this)">Todos</button>
+      <button class="pill"     onclick="setFilter('gpu',this)">GPU</button>
+      <button class="pill"     onclick="setFilter('cpu',this)">CPU</button>
+      <button class="pill"     onclick="setFilter('ram',this)">RAM</button>
+      <button class="pill"     onclick="setFilter('perifericos',this)">Periféricos</button>
+    </div>
+    <div class="toolbar-right">
+      <select class="sort-select" id="sort-sel" onchange="render()">
+        <option value="discount">↓ Maior desconto</option>
+        <option value="price_asc">↑ Menor preço</option>
+        <option value="price_desc">↓ Maior preço</option>
+      </select>
+      <button class="btn-refresh" id="btn-ref" onclick="load()">
+        <span class="spin">↻</span> Atualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- Table head (desktop) -->
+  <div class="table-head">
+    <span>#</span>
+    <span>Produto</span>
+    <span>Preço</span>
+    <span>Original</span>
+    <span>Desconto</span>
+    <span></span>
+  </div>
+
+  <!-- List -->
+  <div id="deals-list"></div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-live">
+      <div class="pulsedot"></div>
+      <span id="last-update">Buscando dados...</span>
+    </div>
+    <div class="footer-note">preços sem garantia · verifique na loja · links afiliados</div>
+  </footer>
+
+</div>
+
+<script>
+// ── Config ─────────────────────────────────────────────────────
+// Aponte para seu backend local ou deploy
+const API_BASE = 'http://localhost:3001/api';
+
+// Fallback demo para rodar sem backend
+const DEMO_DATA = [
+  { id:1, rank:1, name:'RTX 4070 Super 12GB', category:'gpu', store:'Kabum',  price:2799, original:3499, discount_pct:20, url:'#', in_stock:1, badge:'hot'  },
+  { id:2, rank:2, name:'RTX 3060 12GB',        category:'gpu', store:'Auto Bot',price:1499,original:1899,discount_pct:21,url:'#',in_stock:1,badge:'new' },
+  { id:3, rank:3, name:'RTX 4060 8GB',          category:'gpu', store:'Amazon', price:3399, original:3799,discount_pct:11,url:'#',in_stock:1,badge:null  },
+  { id:4, rank:4, name:'Ryzen 5 5600',           category:'cpu', store:'Auto Bot',price:599, original:799, discount_pct:25,url:'#',in_stock:1,badge:'lim' },
+  { id:5, rank:5, name:'Kingston Fury 32GB DDR5',category:'ram', store:'Pichau', price:689, original:849, discount_pct:19,url:'#',in_stock:1,badge:null  },
+  { id:6, rank:6, name:'Ryzen 7 7700X',          category:'cpu', store:'Kabum',  price:1399,original:1799,discount_pct:22,url:'#',in_stock:1,badge:null  },
+];
+
+// ── State ──────────────────────────────────────────────────────
+let allDeals   = [];
+let activeFilter = 'all';
+let usingDemo  = false;
+
+// ── Load ───────────────────────────────────────────────────────
+async function load() {
+  const btn = document.getElementById('btn-ref');
+  btn.classList.add('loading');
+  btn.querySelector('.spin').textContent = '↻';
+
+  showSkeletons(5);
+
+  try {
+    const [dealsRes, statsRes] = await Promise.all([
+      fetch(`${API_BASE}/deals`).then(r => { if(!r.ok) throw new Error(); return r.json(); }),
+      fetch(`${API_BASE}/stats`).then(r => { if(!r.ok) throw new Error(); return r.json(); }),
+    ]);
+
+    allDeals  = dealsRes.data || [];
+    usingDemo = false;
+
+    if (statsRes.ok) {
+      const s = statsRes.data;
+      document.getElementById('s-deals').textContent   = s.activeDeals;
+      document.getElementById('s-savings').textContent = `R$${(s.totalSavingsR$ / 1000).toFixed(0)}k`;
+      document.getElementById('last-update').textContent =
+        `Atualizado ${timeAgo(s.lastScrapedAt)} · ${s.activeDeals} produtos monitorados`;
+    }
+
+  } catch (_) {
+    // Backend offline → usa demo
+    allDeals  = DEMO_DATA;
+    usingDemo = true;
+    document.getElementById('s-deals').textContent   = DEMO_DATA.length;
+    document.getElementById('s-savings').textContent = 'R$2k';
+    document.getElementById('last-update').textContent = '⚠ Backend offline — mostrando dados de demonstração';
+  }
+
+  render();
+
+  btn.classList.remove('loading');
+  btn.querySelector('.spin').textContent = '✓';
+  setTimeout(() => { btn.querySelector('.spin').textContent = '↻'; }, 1800);
+}
+
+// ── Render ─────────────────────────────────────────────────────
+function render() {
+  const sort   = document.getElementById('sort-sel').value;
+  const list   = document.getElementById('deals-list');
+
+  let data = activeFilter === 'all'
+    ? [...allDeals]
+    : allDeals.filter(d => d.category === activeFilter);
+
+  // Sort
+  data.sort((a, b) => {
+    if (sort === 'discount')    return (b.discount_pct||0) - (a.discount_pct||0);
+    if (sort === 'price_asc')   return a.price - b.price;
+    if (sort === 'price_desc')  return b.price - a.price;
+    return 0;
+  });
+
+  if (!data.length) {
+    list.innerHTML = `<div class="state-msg"><b>Nenhuma oferta</b>Tente outro filtro ou aguarde a próxima atualização.</div>`;
+    return;
+  }
+
+  list.innerHTML = data.map((d, i) => cardHTML(d, i + 1)).join('');
+}
+
+// ── Card HTML ──────────────────────────────────────────────────
+function cardHTML(d, rank) {
+  const badge = badgeHTML(d);
+  const disc  = d.discount_pct ? Math.round(d.discount_pct) : null;
+  const discColor = disc && disc >= 20 ? 'good' : '';
+
+  return `
+  <div class="card ${rank === 1 ? 'top1' : ''}">
+    <div class="c-rank">${String(rank).padStart(2,'0')}</div>
+
+    <div class="c-name">
+      <div class="c-name-main">
+        ${escHTML(d.name)}
+        ${badge}
+      </div>
+      <div class="c-meta">
+        <span class="store-dot"></span>
+        ${escHTML(d.store)}
+        <span style="opacity:.4">·</span>
+        <span style="text-transform:uppercase;font-size:10px;">${escHTML(d.category)}</span>
+      </div>
+    </div>
+
+    <div class="c-price">R$ ${fmtPrice(d.price)}</div>
+
+    <div class="c-original">${d.original ? 'R$ ' + fmtPrice(d.original) : '—'}</div>
+
+    <div class="c-disc ${discColor}">${disc ? '−' + disc + '%' : '—'}</div>
+
+    <a class="btn-buy" href="${d.url}" target="_blank" rel="noopener">
+      Comprar →
+    </a>
+  </div>`;
+}
+
+function badgeHTML(d) {
+  if (d.badge === 'hot' || (d.discount_pct && d.discount_pct >= 25))
+    return '<span class="badge b-hot">🔥 Hot</span>';
+  if (d.badge === 'new')
+    return '<span class="badge b-new">New</span>';
+  if (d.badge === 'lim')
+    return '<span class="badge b-lim">⚡ Limitado</span>';
+  return '';
+}
+
+// ── Skeletons ──────────────────────────────────────────────────
+function showSkeletons(n) {
+  const list = document.getElementById('deals-list');
+  list.innerHTML = Array.from({length: n}, () => `
+    <div class="skeleton">
+      <div class="skel-bar" style="width:28px;height:20px;"></div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+        <div class="skel-bar" style="width:55%;height:14px;"></div>
+        <div class="skel-bar" style="width:30%;height:10px;"></div>
+      </div>
+      <div class="skel-bar" style="width:80px;height:22px;"></div>
+      <div class="skel-bar" style="width:80px;height:14px;margin-left:16px;"></div>
+      <div class="skel-bar" style="width:50px;height:14px;margin-left:16px;"></div>
+      <div class="skel-bar" style="width:100px;height:36px;border-radius:5px;margin-left:16px;"></div>
+    </div>
+  `).join('');
+}
+
+// ── Filter ─────────────────────────────────────────────────────
+function setFilter(cat, btn) {
+  document.querySelectorAll('.pill').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  activeFilter = cat;
+  render();
+}
+
+// ── Utils ───────────────────────────────────────────────────────
+function fmtPrice(n) {
+  return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+function escHTML(s = '') {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function timeAgo(ts) {
+  if (!ts) return 'agora';
+  const diff = Math.round((Date.now() - new Date(ts).getTime()) / 60000);
+  if (diff < 2)   return 'agora';
+  if (diff < 60)  return `há ${diff} min`;
+  if (diff < 1440) return `há ${Math.round(diff/60)}h`;
+  return `há ${Math.round(diff/1440)} dias`;
+}
+
+// ── Init ───────────────────────────────────────────────────────
+load();
+// Auto-refresh a cada 5 min
+setInterval(load, 5 * 60 * 1000);
+</script>
+</body>
+</html>
